@@ -186,17 +186,19 @@
     <Compile Include="Controllers\ActorsController.cs" />
     <Compile Include="Controllers\BankAccountsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\TransactionsController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201805240948122_Initial.cs" />
-    <Compile Include="Migrations\201805240948122_Initial.Designer.cs">
-      <DependentUpon>201805240948122_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201805241549456_initial.cs" />
+    <Compile Include="Migrations\201805241549456_initial.Designer.cs">
+      <DependentUpon>201805241549456_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Actor.cs" />
     <Compile Include="Models\BankAccount.cs" />
+    <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\Ubg_Api_v4Context.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -231,7 +233,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Properties\PublishProfiles\UbgApiv420180524123147 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\UbgApiv420180524061045 - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -270,8 +272,8 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201805240948122_Initial.resx">
-      <DependentUpon>201805240948122_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201805241549456_initial.resx">
+      <DependentUpon>201805241549456_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

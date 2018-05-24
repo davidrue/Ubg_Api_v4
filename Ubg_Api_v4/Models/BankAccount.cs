@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Ubg_Api_v4.Models
 {
@@ -15,8 +17,11 @@ namespace Ubg_Api_v4.Models
         [Required]
         public string Iban { get; set; }
 
+        public int Priority { get; set; }
 
-        // Foreign Key
-        public string Actor_Id { get; set; }
+        
+        [ForeignKey("Id")]
+        [JsonIgnore]
+        public virtual Actor Actor { get; set; }
     }
 }
