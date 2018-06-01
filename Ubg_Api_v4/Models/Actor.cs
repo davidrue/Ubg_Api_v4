@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -31,6 +30,8 @@ namespace Ubg_Api_v4.Models
         public Boolean IsCommercial { get; set; }
 
         public string AuthToken { get; set; }
+
+        public string firstIban { get; set; }
 
         [Required]
         public string Password { get; set; }

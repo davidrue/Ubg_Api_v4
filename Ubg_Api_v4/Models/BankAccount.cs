@@ -15,12 +15,15 @@ namespace Ubg_Api_v4.Models
         public string Id { get; set; }
 
         [Required]
+        public string ActorId { get; set; }
+
+        [Required]
         public string Iban { get; set; }
 
         public int Priority { get; set; }
 
         
-        [ForeignKey("Id")]
+        [ForeignKey("ActorId")]
         [JsonIgnore]
         public virtual Actor Actor { get; set; }
     }
