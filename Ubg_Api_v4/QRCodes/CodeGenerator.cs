@@ -39,7 +39,8 @@ namespace Ubg_Api_v4.QRCodes
     public class CodeGenerator
     {
         QRCodeEncoder qrEncoder;
-        String path = "C:\\Users\\david\\Dropbox\\";
+        String pathNotebook = "C:\\Users\\david\\Dropbox\\";
+        String pathPC = "D:\\Dropbox\\";
         public CodeGenerator()
         {
             this.qrEncoder = new QRCodeEncoder();
@@ -48,7 +49,7 @@ namespace Ubg_Api_v4.QRCodes
 
         public void RenderQrCode()
         {
-            String saveIn = path + "Code1.jpg";
+            String saveIn = pathNotebook + "Code1.jpg";
             Bitmap img = this.qrEncoder.Encode("ubg.transfer/347as9sd.com");
             img.Save(saveIn, ImageFormat.Jpeg);
             //img.Save("~/QRCodes/Codes/Code1.jpg", ImageFormat.Jpeg);
@@ -57,14 +58,14 @@ namespace Ubg_Api_v4.QRCodes
         }
         public Image RenderQRWithPicture()
         {
-            String saveIn = path + "Code1.jpg";
+            String saveIn = pathNotebook + "Code1.jpg";
             qrEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.H; //30%
             qrEncoder.QRCodeScale = 10;
 
 
             Bitmap img = this.qrEncoder.Encode("ubg.transfer/347as9sd.com");
 
-            System.Drawing.Image logo = System.Drawing.Image.FromFile(path + "ubgLogo.jpg");
+            System.Drawing.Image logo = System.Drawing.Image.FromFile(pathNotebook + "ubgLogo.jpg");
 
 
             Graphics g = Graphics.FromImage(img);
@@ -77,6 +78,28 @@ namespace Ubg_Api_v4.QRCodes
 
             return img;
 
+        }
+        public Image RenderQRWithPicture(String url)
+        {
+            String saveIn = pathPC + "Code1.jpg";
+            qrEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.H; //30%
+            qrEncoder.QRCodeScale = 10;
+
+
+            Bitmap img = this.qrEncoder.Encode(url);
+
+            System.Drawing.Image logo = System.Drawing.Image.FromFile(System.Web.Hosting.HostingEnvironment.MapPath(@"~\QRCodes\ubgLogo.jpg"));
+
+
+            Graphics g = Graphics.FromImage(img);
+            int left = (img.Width / 2) - (logo.Width / 2);
+            int top = (img.Height / 2) - (logo.Height / 2);
+            g.DrawImage(logo, new Point(left, top));
+
+
+            img.Save(System.Web.Hosting.HostingEnvironment.MapPath(@"~\QRCodes\Code1.jpg"), ImageFormat.Jpeg);
+            img.Save(saveIn, ImageFormat.Jpeg);
+            return img;
 
         }
     }

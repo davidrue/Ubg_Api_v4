@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Ubg_Api_v4.Models
 {
@@ -13,11 +14,16 @@ namespace Ubg_Api_v4.Models
         public string Id { get; set; }
 
         [Required]
-        [ForeignKey("Id")]
+        public string RecipientId { get; set; }
+
+        public string SenderId { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey("RecipientId")]
         public virtual Actor Recipient { get; set; }
 
-        [Required]
-        [ForeignKey("Id")]
+        [JsonIgnore]
+        [ForeignKey("SenderId")]
         public virtual Actor Sender { get; set; }
 
         [Required]
@@ -38,6 +44,7 @@ namespace Ubg_Api_v4.Models
         [Required]
         public Boolean AdjustibleDown { get; set; }
 
+        //Opened, Payed, Closed
         [Required]
         public string Status { get; set; }
 

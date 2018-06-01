@@ -163,6 +163,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201806012119091_ForeignKeysrecipientSenderId.cs" />
+    <Compile Include="Migrations\201806012119091_ForeignKeysrecipientSenderId.Designer.cs">
+      <DependentUpon>201806012119091_ForeignKeysrecipientSenderId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QRCodes\QrTransactionModel.cs" />
     <Content Include="App_Code\QRVerToDataSize.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -233,6 +238,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="QRCodes\ubgLogo.jpg" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -307,6 +313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806011351319_ForeignKeyActorId.resx">
       <DependentUpon>201806011351319_ForeignKeyActorId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806012119091_ForeignKeysrecipientSenderId.resx">
+      <DependentUpon>201806012119091_ForeignKeysrecipientSenderId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

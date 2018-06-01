@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -39,102 +40,38 @@ namespace Ubg_Api_v4.Controllers
 
             CodeGenerator qrGenerator = new CodeGenerator();
             Image img = qrGenerator.RenderQRWithPicture();
-
-
+            
             //return Ok(img);
             return Ok(actor);
         }
 
-        //private IHttpActionResult Ok(Actor actor, Image img)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //// PUT: api/Actors/5
-        //[ResponseType(typeof(void))]
-        //public async Task<IHttpActionResult> PutActor(string id, Actor actor)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (id != actor.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    db.Entry(actor).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ActorExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
-
-        //// POST: api/Actors
-        //[ResponseType(typeof(Actor))]
-        //public async Task<IHttpActionResult> PostActor(Actor actor)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    db.Actors.Add(actor);
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        if (ActorExists(actor.Id))
-        //        {
-        //            return Conflict();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return CreatedAtRoute("DefaultApi", new { id = actor.Id }, actor);
-        //}
-
+        
         // POST: vendor-api/{version}/register
         [ResponseType(typeof(Actor))]
         [Route("vendor-api/{version}/register", Name = "RegisterNewVendor")]
         public async Task<HttpResponseMessage> PostActor(ActorViewModels.RegisterViewModel actorModel)
         {
+            if (!ModelState.IsValid)
+            {               
+                //Password has no unique StatusCode
+                var response2 = Request.CreateResponse((HttpStatusCode) 422, ModelState);
+                return response2;
+            }
+
 
             Actor actor = new Actor();
+           
 
             actor.IsCommercial = true;
             actor.IsPrivate = false;
 
-            actor.firstIban = actorModel.firstIban.Replace(" ", "");
-            actor.SurName = actorModel.SurName;
-            actor.Name = actorModel.Name;
-            actor.Email = actorModel.Email;
-            actor.Password = actorModel.Password;
-            actor.UserName = actorModel.UserName;
+            actor.firstIban = actorModel.first_iban.Replace(" ", "");
+            actor.SurName = actorModel.sur_name;
+            actor.Name = actorModel.name;
+            actor.Email = actorModel.email;
+            actor.Password = actorModel.password;
+            actor.UserName = actorModel.user_name;
             actor.Id = HelperMethods.GetUniqueKey(15);
-
-
 
             BankAccount bankAccount = new BankAccount();
             bankAccount.Id = HelperMethods.GetUniqueKey(14);
@@ -143,8 +80,6 @@ namespace Ubg_Api_v4.Controllers
 
             bankAccount.ActorId = actor.Id;
             
-
-
             if (db.Actors.Any(u => u.UserName == actor.UserName))
             {
                 //If userName already exists
@@ -198,6 +133,120 @@ namespace Ubg_Api_v4.Controllers
             
             //return CreatedAtRoute("DefaultApi", new { id = actor.Id }, actor);
         }
+
+        // POST: vendor-api/{version}/auth       
+        [Route("vendor-api/{version}/auth", Name = "RequestToken")]
+        public async Task<HttpResponseMessage> PostTokenRequest(ActorViewModels.RequestTokenViewModel requestTokenViewModel)
+        {
+            
+            if (!ModelState.IsValid)
+            {                
+                var response2 = Request.CreateResponse((HttpStatusCode)422, ModelState);
+                return response2;
+            }
+
+            if (!db.Actors.Any(u => u.UserName == requestTokenViewModel.user_name))
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, requestTokenViewModel.user_name);
+            }
+            string AuthToken = HelperMethods.GetUniqueKey(20);
+            if (db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).Password == requestTokenViewModel.password)
+            {
+                db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).AuthToken = AuthToken;
+            }
+            else
+            {
+                var response1 = Request.CreateResponse(HttpStatusCode.Unauthorized, "Password does not match!");
+                return response1;
+            }
+            
+            
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+
+            }
+
+            var response = Request.CreateResponse((HttpStatusCode)200, AuthToken);
+            return response;
+        }
+
+        // POST: vendor-api/{version}/auth       
+        [Route("vendor-api/{version}/generate", Name = "RequestQrCode")]
+        public async Task<HttpResponseMessage> PostRequestQrCode(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var response2 = Request.CreateResponse((HttpStatusCode)422, ModelState);
+                return response2;
+            }
+
+            if (!db.Actors.Any(u => u.UserName == requestQrCodeViewModel.user_name))
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, requestQrCodeViewModel.user_name);
+            }
+            if (!(db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).AuthToken == requestQrCodeViewModel.auth_token))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "AuthToken is not valid!" );
+            }
+            if(requestQrCodeViewModel.available_until > 259200)
+            {
+                return Request.CreateResponse((HttpStatusCode) 468, "Availability is too long. Maximum is 72 hours.");
+            }
+            if (requestQrCodeViewModel.available_until < 60)
+            {
+                return Request.CreateResponse((HttpStatusCode)469, "Availability is too short. Minimum is 60 seconds.");
+            }
+            if (requestQrCodeViewModel.reference.Length > 140)
+            {
+                return Request.CreateResponse((HttpStatusCode)464, "Reference code is too long. Max length is 140 chars.");
+            }
+
+            Transaction transaction = new Transaction();
+            transaction.Amount = requestQrCodeViewModel.amount;
+            transaction.Currency = requestQrCodeViewModel.currency;
+            transaction.Reference = requestQrCodeViewModel.reference;
+            transaction.AvailableUntil = DateTime.Now.AddSeconds(requestQrCodeViewModel.available_until);
+            transaction.AdjustibleUp = requestQrCodeViewModel.adjustible_up;
+            transaction.AdjustibleDown = requestQrCodeViewModel.adjustible_down;
+            transaction.Status = "Open";
+            transaction.RecipientId = db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Id;
+            string transactionId = HelperMethods.GetUniqueKey(12);
+            transaction.Id = transactionId;
+
+            db.Transactions.Add(transaction);
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+
+            }
+
+            String transactionUrl = "ubg.transfer/" + transactionId;
+
+            CodeGenerator qrGenerator = new CodeGenerator();
+            Image img = qrGenerator.RenderQRWithPicture(transactionUrl);
+
+
+            QrTransactionModel.QrLinKRefViewModel qrLinKRefViewModel = new QrTransactionModel.QrLinKRefViewModel();
+            qrLinKRefViewModel.link = transactionUrl;
+            qrLinKRefViewModel.img = img;
+            qrLinKRefViewModel.refId = transactionId;
+
+                                 
+
+            var response = Request.CreateResponse(HttpStatusCode.Created, qrLinKRefViewModel);
+            return response;
+        }
+
 
         // DELETE: api/Actors/5
         [ResponseType(typeof(Actor))]
