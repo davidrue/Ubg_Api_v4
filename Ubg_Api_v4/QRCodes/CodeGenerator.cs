@@ -56,30 +56,8 @@ namespace Ubg_Api_v4.QRCodes
        
 
         }
-        public Image RenderQRWithPicture()
-        {
-            String saveIn = pathNotebook + "Code1.jpg";
-            qrEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.H; //30%
-            qrEncoder.QRCodeScale = 10;
-
-
-            Bitmap img = this.qrEncoder.Encode("ubg.transfer/347as9sd.com");
-
-            System.Drawing.Image logo = System.Drawing.Image.FromFile(pathNotebook + "ubgLogo.jpg");
-
-
-            Graphics g = Graphics.FromImage(img);
-            int left = (img.Width / 2) - (logo.Width / 2);
-            int top = (img.Height / 2) - (logo.Height / 2);
-            g.DrawImage(logo, new Point(left, top));
-
-
-            img.Save(saveIn, ImageFormat.Jpeg);
-
-            return img;
-
-        }
-        public Image RenderQRWithPicture(String url)
+ 
+        public string RenderQRWithPicture(String url)
         {
             String saveIn = pathPC + "Code1.jpg";
             qrEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.H; //30%
@@ -97,10 +75,29 @@ namespace Ubg_Api_v4.QRCodes
             g.DrawImage(logo, new Point(left, top));
 
 
-            img.Save(System.Web.Hosting.HostingEnvironment.MapPath(@"~\QRCodes\Code1.jpg"), ImageFormat.Jpeg);
-            img.Save(saveIn, ImageFormat.Jpeg);
-            return img;
+            string projectPath = System.Web.Hosting.HostingEnvironment.MapPath(@"~\QRCodes\Code1.jpg");
+            img.Save(projectPath, ImageFormat.Jpeg);
+            //img.Save(saveIn, ImageFormat.Jpeg);
 
+            
+            string base64String = this.ImageToBase64(projectPath);
+            return base64String;
+
+        }
+
+        public string ImageToBase64(String path )
+        {
+            string base64String = null;            
+            using (System.Drawing.Image image = System.Drawing.Image.FromFile(path))
+            {
+                using (MemoryStream m = new MemoryStream())
+                {
+                    image.Save(m, image.RawFormat);
+                    byte[] imageBytes = m.ToArray();
+                    base64String = Convert.ToBase64String(imageBytes);
+                    return base64String;
+                }
+            }
         }
     }
 }

@@ -36,12 +36,8 @@ namespace Ubg_Api_v4.Controllers
             if (actor == null)
             {
                 return NotFound();
-            }
-
-            CodeGenerator qrGenerator = new CodeGenerator();
-            Image img = qrGenerator.RenderQRWithPicture();
-            
-            //return Ok(img);
+            }       
+          
             return Ok(actor);
         }
 
@@ -58,9 +54,7 @@ namespace Ubg_Api_v4.Controllers
                 return response2;
             }
 
-
-            Actor actor = new Actor();
-           
+            Actor actor = new Actor();           
 
             actor.IsCommercial = true;
             actor.IsPrivate = false;
@@ -233,7 +227,7 @@ namespace Ubg_Api_v4.Controllers
             String transactionUrl = "ubg.transfer/" + transactionId;
 
             CodeGenerator qrGenerator = new CodeGenerator();
-            Image img = qrGenerator.RenderQRWithPicture(transactionUrl);
+            string img = qrGenerator.RenderQRWithPicture(transactionUrl);
 
 
             QrTransactionModel.QrLinKRefViewModel qrLinKRefViewModel = new QrTransactionModel.QrLinKRefViewModel();
@@ -241,7 +235,7 @@ namespace Ubg_Api_v4.Controllers
             qrLinKRefViewModel.img = img;
             qrLinKRefViewModel.refId = transactionId;
 
-                                 
+           //TODO Test if QR should be included
 
             var response = Request.CreateResponse(HttpStatusCode.Created, qrLinKRefViewModel);
             return response;
