@@ -48,6 +48,22 @@ namespace Ubg_Api_v4.QRCodes
         }
 
 
+        public class PaymentConfirmationModel
+        {
+           
+            public string refId { get; set; }
+            public string auth_token { get; set; }            
+
+        }
+
+        public class PaymentConfirmationAnswerModel
+        {
+
+            public Boolean transfer_commissioned { get; set; }
+            public decimal adjusted_amount { get; set; }
+
+        }
+
 
 
     }

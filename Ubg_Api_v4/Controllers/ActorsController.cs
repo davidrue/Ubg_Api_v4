@@ -41,7 +41,22 @@ namespace Ubg_Api_v4.Controllers
             return Ok(actor);
         }
 
-        
+        // GET: vendor-api/v1.0/confirm
+       
+        [Route("vendor-api/{version}/confirm", Name = "ConfirmPaymentVendor")]
+        public async Task<HttpResponseMessage> ConfirmPayment(QrTransactionModel.PaymentConfirmationModel paymentConfirmation)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse((HttpStatusCode)422, ModelState);
+            }
+            
+            QrTransactionModel.PaymentConfirmationAnswerModel answer = new QrTransactionModel.PaymentConfirmationAnswerModel();
+
+            return Request.CreateResponse(HttpStatusCode.OK, answer);
+        }
+
+
         // POST: vendor-api/{version}/register
         [ResponseType(typeof(Actor))]
         [Route("vendor-api/{version}/register", Name = "RegisterNewVendor")]
