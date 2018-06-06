@@ -37,12 +37,11 @@ namespace Ubg_Api_v4.Controllers
             {
                 return NotFound();
             }       
-          
+            
             return Ok(actor);
         }
 
-        // GET: vendor-api/v1.0/confirm
-       
+        // GET: vendor-api/v1.0/confirm       
         [Route("vendor-api/{version}/confirm", Name = "ConfirmPaymentVendor")]
         public async Task<HttpResponseMessage> ConfirmPayment(QrTransactionModel.PaymentConfirmationModel paymentConfirmation)
         {
@@ -167,8 +166,7 @@ namespace Ubg_Api_v4.Controllers
             {
                 var response1 = Request.CreateResponse(HttpStatusCode.Unauthorized, "Password does not match!");
                 return response1;
-            }
-            
+            }            
             
             try
             {
@@ -250,12 +248,83 @@ namespace Ubg_Api_v4.Controllers
             qrLinKRefViewModel.img = img;
             qrLinKRefViewModel.refId = transactionId;
 
-           //TODO Test if QR should be included
+            //TODO Test if QR should be included
 
-            var response = Request.CreateResponse(HttpStatusCode.Created, qrLinKRefViewModel);
-            return response;
+            return Request.CreateResponse(HttpStatusCode.Created, qrLinKRefViewModel);          
         }
 
+        // GET: client-api/{version}/get-information/{ref_id}
+        [ResponseType(typeof(Actor))]
+        [Route("client-api/{version}/get-information/{ref_id}")]
+        public async Task<HttpResponseMessage> GetInformation([FromUriAttribute] string ref_id)
+        {
+            if (!db.Transactions.Any(u => u.Id == ref_id))
+            {
+                return Request.CreateResponse((HttpStatusCode) 465 , ref_id);
+            }
+            Transaction transaction = await db.Transactions.FirstOrDefaultAsync(u => u.Id == ref_id);
+            if(transaction.AvailableUntil < DateTime.Now)
+            {
+                return Request.CreateResponse((HttpStatusCode) 466, "The transaction is expired: " + ref_id);
+            }
+
+
+            QrTransactionModel.GetInformationFromQRCodeModelAnswer answer = new QrTransactionModel.GetInformationFromQRCodeModelAnswer();
+            answer.iban = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).firstIban;
+            answer.amount = transaction.Amount;
+            answer.currency = transaction.Currency;
+            answer.reference = transaction.Reference;
+            answer.adjustible_up = transaction.AdjustibleUp;
+            answer.adjustible_down = transaction.AdjustibleDown;
+
+            return Request.CreateResponse(HttpStatusCode.OK, answer);
+
+        }
+
+        // POST: client-api/{version}/make-payment/{ref_id}/{client_id}     
+        [Route("vendor-api/{version}/generate", Name = "MakePayment")]
+        public async Task<HttpResponseMessage> PostMakePayment([FromUriAttribute] string ref_id, [FromUriAttribute] string client_id, decimal adjusted_amount)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse((HttpStatusCode)422, ModelState);
+               
+            }
+
+            if (!db.Transactions.Any(u => u.Id == ref_id))
+            {
+                return Request.CreateResponse((HttpStatusCode) 465, "Could not find Transaction: " + ref_id);
+            }
+
+            Transaction transaction = new Transaction();
+            transaction = db.Transactions.FirstOrDefault(u => u.Id == ref_id);
+
+            if (transaction.AvailableUntil < DateTime.Now)
+            {
+                return Request.CreateResponse((HttpStatusCode)466, "The transaction is expired: " + ref_id);
+            }
+
+            if (!db.Actors.Any(u => u.Id == client_id))
+            {
+                return Request.CreateResponse((HttpStatusCode)467, "Unknown Client: " + client_id);
+            }
+
+            db.Transactions.FirstOrDefault(u => u.Id == ref_id).SenderId = client_id;
+            db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount = adjusted_amount;
+            db.Transactions.FirstOrDefault(u => u.Id == ref_id).Status = "Paid";
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, "Successfull Transaction!");
+        }
 
         // DELETE: api/Actors/5
         [ResponseType(typeof(Actor))]
