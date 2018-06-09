@@ -94,7 +94,7 @@ namespace Ubg_Api_v4.QRCodes
                 {
                     image.Save(m, image.RawFormat);
                     byte[] imageBytes = m.ToArray();
-                    base64String = Convert.ToBase64String(imageBytes);
+                    base64String = Convert.ToBase64String(imageBytes);             
                     return base64String;
                 }
             }

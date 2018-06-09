@@ -38,8 +38,7 @@ namespace Ubg_Api_v4.QRCodes
 
             [Required]
             public Boolean include_qr { get; set; }
-
-            [Required]
+               
             public string auth_token { get; set; }
 
             [Required]
@@ -60,7 +59,10 @@ namespace Ubg_Api_v4.QRCodes
         {
 
             public Boolean transfer_commissioned { get; set; }
-            public decimal adjusted_amount { get; set; }
+
+            public Boolean adjusted_amount { get; set; }
+
+            public decimal amount { get; set; }
 
         }
 
@@ -87,6 +89,26 @@ namespace Ubg_Api_v4.QRCodes
 
         }
 
+        public class PaymentHistoryModel
+        {
+            [Required]
+            public decimal amount { get; set; }
 
+            [Required]
+            public string ref_id { get; set; }
+
+            [Required]
+            public string currency { get; set; }
+
+            [Required]
+            public string reference { get; set; }
+            
+            [Required]
+            public Boolean receiver { get; set; }
+
+            [Required]
+            public string other_name { get; set; }
+
+        }
     }
 }

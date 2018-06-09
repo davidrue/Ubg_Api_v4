@@ -44,7 +44,9 @@ namespace Ubg_Api_v4.Models
         [Required]
         public Boolean AdjustibleDown { get; set; }
 
-        //Opened, Payed, Closed
+        public Boolean Adjusted { get; set; }
+
+        //Opened, Paid
         [Required]
         public string Status { get; set; }
 
