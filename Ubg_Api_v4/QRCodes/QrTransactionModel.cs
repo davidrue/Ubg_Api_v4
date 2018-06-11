@@ -36,7 +36,7 @@ namespace Ubg_Api_v4.QRCodes
             [Required]
             public Boolean adjustible_down { get; set; }
 
-            [Required]
+           
             public Boolean include_qr { get; set; }
                
             public string auth_token { get; set; }
@@ -66,6 +66,13 @@ namespace Ubg_Api_v4.QRCodes
 
         }
 
+
+        public class MakePaymentModel
+        {
+
+            public decimal adjusted_amount { get; set; }           
+
+        }
 
         public class GetInformationFromQRCodeModelAnswer
         {

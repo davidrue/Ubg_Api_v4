@@ -23,6 +23,8 @@ namespace Ubg_Api_v4.Controllers
             return db.BankAccounts;
         }
 
+
+
         // GET: api/BankAccounts/5
         [ResponseType(typeof(BankAccount))]
         public async Task<IHttpActionResult> GetBankAccount(string id)

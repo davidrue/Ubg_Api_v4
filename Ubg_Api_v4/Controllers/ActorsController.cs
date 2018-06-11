@@ -96,10 +96,10 @@ namespace Ubg_Api_v4.Controllers
             actor.Email = actorModel.email;
             actor.Password = actorModel.password;
             actor.UserName = actorModel.user_name;
-            actor.Id = HelperMethods.GetUniqueKey(15);
+            actor.Id = "Vendor_" + HelperMethods.GetUniqueKey(10);
 
             BankAccount bankAccount = new BankAccount();
-            bankAccount.Id = HelperMethods.GetUniqueKey(14);
+            bankAccount.Id = "BankAccount_" + HelperMethods.GetUniqueKey(10);
             bankAccount.Iban = actor.firstIban;
             bankAccount.Priority = 1;
 
@@ -154,10 +154,10 @@ namespace Ubg_Api_v4.Controllers
             actor.Email = actorModel.email;
             actor.Password = actorModel.password;
             actor.UserName = actorModel.user_name;
-            actor.Id = HelperMethods.GetUniqueKey(15);
+            actor.Id = "Client_"+ HelperMethods.GetUniqueKey(10);
 
             BankAccount bankAccount = new BankAccount();
-            bankAccount.Id = HelperMethods.GetUniqueKey(14);
+            bankAccount.Id = "bankAccount_" + HelperMethods.GetUniqueKey(10);
             bankAccount.Iban = actor.firstIban;
             bankAccount.Priority = 1;
 
@@ -205,7 +205,7 @@ namespace Ubg_Api_v4.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, requestTokenViewModel.user_name);
             }
-            string AuthToken = HelperMethods.GetUniqueKey(20);
+            string AuthToken = "Auth_" + HelperMethods.GetUniqueKey(10);
             if (db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).Password == requestTokenViewModel.password)
             {
                 db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).AuthToken = AuthToken;
@@ -229,7 +229,7 @@ namespace Ubg_Api_v4.Controllers
             var response = Request.CreateResponse((HttpStatusCode)200, AuthToken);
             return response;
         }
-
+    
         // POST: vendor-api/{version}/auth       
         [Route("vendor-api/{version}/generate", Name = "RequestQrCodeAsVendor")]
         public async Task<HttpResponseMessage> PostRequestQrCodeAsVendor(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel)
@@ -270,7 +270,7 @@ namespace Ubg_Api_v4.Controllers
             transaction.AdjustibleDown = requestQrCodeViewModel.adjustible_down;
             transaction.Status = "Open";
             transaction.RecipientId = db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Id;
-            string transactionId = HelperMethods.GetUniqueKey(12);
+            string transactionId = "Ref_" + HelperMethods.GetUniqueKey(10);
             transaction.Id = transactionId;
 
             db.Transactions.Add(transaction);
@@ -303,7 +303,7 @@ namespace Ubg_Api_v4.Controllers
 
 
         // POST: client-api/{version}/auth       
-        [Route("client-api/{version}/generate", Name = "RequestQrCodeAsClient")]
+        [Route("client-api/{version}/generate", Name = "RequestQrCodeAsClient")]        
         public async Task<HttpResponseMessage> PostRequestQrCodeAsClient(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel)
         {
             if (!ModelState.IsValid)
@@ -337,7 +337,7 @@ namespace Ubg_Api_v4.Controllers
             transaction.AdjustibleDown = requestQrCodeViewModel.adjustible_down;
             transaction.Status = "Open";
             transaction.RecipientId = db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Id;
-            string transactionId = HelperMethods.GetUniqueKey(12);
+            string transactionId = "Priv_Trans_" + HelperMethods.GetUniqueKey(10);
             transaction.Id = transactionId;
 
             db.Transactions.Add(transaction);
@@ -369,7 +369,7 @@ namespace Ubg_Api_v4.Controllers
         }
 
 
-        // GET: client-api/{version}/get-information/{ref_id}
+        // GET: client-api/{version}/get-information
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/get-information/{ref_id}")]
         public async Task<HttpResponseMessage> GetInformation([FromUriAttribute] string ref_id)
@@ -396,9 +396,12 @@ namespace Ubg_Api_v4.Controllers
 
         }
 
-        // POST: client-api/{version}/make-payment/{ref_id}/{client_id}     
-        [Route("vendor-api/{version}/generate", Name = "MakePayment")]
-        public async Task<HttpResponseMessage> PostMakePayment([FromUriAttribute] string ref_id, [FromUriAttribute] string client_id, decimal adjusted_amount)
+
+
+        // POST: client-api/{version}/make-payment
+        [HttpPost]
+        [Route("client-api/{version}/make-payment/{ref_id}/{client_id}")]
+        public async Task<HttpResponseMessage> PostMakePayment([FromUriAttribute] string ref_id, [FromUriAttribute] string client_id, QrTransactionModel.MakePaymentModel adjusted_amountModel)
         {
             if (!ModelState.IsValid)
             {
@@ -425,10 +428,10 @@ namespace Ubg_Api_v4.Controllers
             }
 
             db.Transactions.FirstOrDefault(u => u.Id == ref_id).SenderId = client_id;
-            if(db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount != adjusted_amount)
+            if(db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount != adjusted_amountModel.adjusted_amount)
             {
                 transaction.Adjusted = true;
-                db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount = adjusted_amount;
+                db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount = adjusted_amountModel.adjusted_amount;
             }
           
             db.Transactions.FirstOrDefault(u => u.Id == ref_id).Status = "Paid";
@@ -446,12 +449,12 @@ namespace Ubg_Api_v4.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, "Successfull Transaction!");
         }
 
-
         // GET: client-api/{version}/get-information/{ref_id}
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/{client_id}/paymenthistory")]
         public async Task<HttpResponseMessage> GetPaymentHistory([FromUriAttribute] string client_id)
         {
+            
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse((HttpStatusCode)422, ModelState);
@@ -468,10 +471,12 @@ namespace Ubg_Api_v4.Controllers
             //}
 
             List <QrTransactionModel.PaymentHistoryModel> paymentList = new List <QrTransactionModel.PaymentHistoryModel>();
+
             IQueryable<Transaction> senderTransactions = db.Transactions.Where(u => u.SenderId == client_id);
             IQueryable<Transaction> receiverTransactions = db.Transactions.Where(u => u.RecipientId == client_id);
+          
 
-            foreach(Transaction transaction in senderTransactions){
+            foreach (Transaction transaction in senderTransactions){
                 var payment = new QrTransactionModel.PaymentHistoryModel();
                 payment.ref_id = transaction.Id;
                 payment.amount = transaction.Amount;
@@ -481,7 +486,7 @@ namespace Ubg_Api_v4.Controllers
                 payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).UserName;
                 paymentList.Add(payment);
             }
-
+           
             foreach (Transaction transaction in receiverTransactions)
             {
                 var payment = new QrTransactionModel.PaymentHistoryModel();
@@ -493,7 +498,12 @@ namespace Ubg_Api_v4.Controllers
                 payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.SenderId).UserName;
                 paymentList.Add(payment);
             }
-
+           
+            if (paymentList.Count == 0)
+            {
+                return Request.CreateResponse((HttpStatusCode) 470, "No history");
+            }
+           
             return Request.CreateResponse(HttpStatusCode.OK, paymentList);
 
         }
