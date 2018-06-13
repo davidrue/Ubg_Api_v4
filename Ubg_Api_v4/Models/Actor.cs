@@ -31,6 +31,8 @@ namespace Ubg_Api_v4.Models
 
         public string AuthToken { get; set; }
 
+        public DateTime Expiration_AuthToken { get; set; }
+
         public string firstIban { get; set; }
 
         [Required]

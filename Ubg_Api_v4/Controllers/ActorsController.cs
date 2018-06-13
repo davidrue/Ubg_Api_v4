@@ -96,6 +96,7 @@ namespace Ubg_Api_v4.Controllers
             actor.Email = actorModel.email;
             actor.Password = actorModel.password;
             actor.UserName = actorModel.user_name;
+            actor.Expiration_AuthToken = DateTime.Now;
             actor.Id = "Vendor_" + HelperMethods.GetUniqueKey(10);
 
             BankAccount bankAccount = new BankAccount();
@@ -154,6 +155,7 @@ namespace Ubg_Api_v4.Controllers
             actor.Email = actorModel.email;
             actor.Password = actorModel.password;
             actor.UserName = actorModel.user_name;
+            actor.Expiration_AuthToken = DateTime.Now;
             actor.Id = "Client_"+ HelperMethods.GetUniqueKey(10);
 
             BankAccount bankAccount = new BankAccount();
@@ -206,9 +208,11 @@ namespace Ubg_Api_v4.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, requestTokenViewModel.user_name);
             }
             string AuthToken = "Auth_" + HelperMethods.GetUniqueKey(10);
+            DateTime ExpiryDate = DateTime.Now.AddHours(24);
             if (db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).Password == requestTokenViewModel.password)
             {
                 db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).AuthToken = AuthToken;
+                db.Actors.FirstOrDefault(u => u.UserName == requestTokenViewModel.user_name).Expiration_AuthToken = ExpiryDate;
             }
             else
             {
@@ -225,9 +229,11 @@ namespace Ubg_Api_v4.Controllers
                 throw;
 
             }
-
-            var response = Request.CreateResponse((HttpStatusCode)200, AuthToken);
-            return response;
+            QrTransactionModel.AnswertAuthTokenModel answer = new QrTransactionModel.AnswertAuthTokenModel();
+            answer.auth_token = AuthToken;
+            answer.ExpiryDate = ExpiryDate;
+            return Request.CreateResponse((HttpStatusCode)200, answer);
+            
         }
     
         // POST: vendor-api/{version}/auth       
@@ -248,7 +254,11 @@ namespace Ubg_Api_v4.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, "AuthToken is not valid!" );
             }
-            if(requestQrCodeViewModel.available_until > 259200)
+            if (db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Expiration_AuthToken < DateTime.Now)
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "AuthToken is expired!");
+            }
+            if (requestQrCodeViewModel.available_until > 259200)
             {
                 return Request.CreateResponse((HttpStatusCode) 468, "Availability is too long. Maximum is 72 hours.");
             }
@@ -285,7 +295,7 @@ namespace Ubg_Api_v4.Controllers
 
             }
 
-            String transactionUrl = "ubg.transfer/" + transactionId;
+            String transactionUrl = "ubgpay://trans/" + transactionId;
 
             CodeGenerator qrGenerator = new CodeGenerator();
             string img = qrGenerator.RenderQRWithPicture(transactionUrl);
@@ -454,7 +464,6 @@ namespace Ubg_Api_v4.Controllers
         [Route("client-api/{version}/{client_id}/paymenthistory")]
         public async Task<HttpResponseMessage> GetPaymentHistory([FromUriAttribute] string client_id)
         {
-            
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse((HttpStatusCode)422, ModelState);
@@ -472,21 +481,22 @@ namespace Ubg_Api_v4.Controllers
 
             List <QrTransactionModel.PaymentHistoryModel> paymentList = new List <QrTransactionModel.PaymentHistoryModel>();
 
-            IQueryable<Transaction> senderTransactions = db.Transactions.Where(u => u.SenderId == client_id);
-            IQueryable<Transaction> receiverTransactions = db.Transactions.Where(u => u.RecipientId == client_id);
-          
+            List<Transaction> senderTransactions = db.Transactions.Where(u => u.SenderId == client_id).ToList();            
+            List<Transaction> receiverTransactions = db.Transactions.Where(u => u.RecipientId == client_id).ToList();
+            
 
-            foreach (Transaction transaction in senderTransactions){
+             foreach (Transaction transaction in senderTransactions){
                 var payment = new QrTransactionModel.PaymentHistoryModel();
                 payment.ref_id = transaction.Id;
                 payment.amount = transaction.Amount;
                 payment.currency = transaction.Currency;
                 payment.reference = transaction.Reference;
                 payment.receiver = false;
-                payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).UserName;
+                payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).UserName;                                
                 paymentList.Add(payment);
             }
-           
+            //Hier endet der Fehler
+
             foreach (Transaction transaction in receiverTransactions)
             {
                 var payment = new QrTransactionModel.PaymentHistoryModel();
@@ -499,11 +509,12 @@ namespace Ubg_Api_v4.Controllers
                 paymentList.Add(payment);
             }
            
+
             if (paymentList.Count == 0)
             {
                 return Request.CreateResponse((HttpStatusCode) 470, "No history");
             }
-           
+            //return Request.CreateResponse(HttpStatusCode.BadGateway, "Shiiit");
             return Request.CreateResponse(HttpStatusCode.OK, paymentList);
 
         }

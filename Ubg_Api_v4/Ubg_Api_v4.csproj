@@ -171,6 +171,22 @@
     <Compile Include="Migrations\201806091335280_AdjustedAmount.Designer.cs">
       <DependentUpon>201806091335280_AdjustedAmount.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806130951261_expiryDateAuthTolen.cs" />
+    <Compile Include="Migrations\201806130951261_expiryDateAuthTolen.Designer.cs">
+      <DependentUpon>201806130951261_expiryDateAuthTolen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806130955189_empty.cs" />
+    <Compile Include="Migrations\201806130955189_empty.Designer.cs">
+      <DependentUpon>201806130955189_empty.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806130957142_New.cs" />
+    <Compile Include="Migrations\201806130957142_New.Designer.cs">
+      <DependentUpon>201806130957142_New.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806130958169_SecondTry.cs" />
+    <Compile Include="Migrations\201806130958169_SecondTry.Designer.cs">
+      <DependentUpon>201806130958169_SecondTry.cs</DependentUpon>
+    </Compile>
     <Compile Include="QRCodes\QrTransactionModel.cs" />
     <Content Include="App_Code\QRVerToDataSize.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -269,7 +285,7 @@
     </Content>
     <Content Include="App_Code\QRCode.cshtml" />
     <Content Include="QRCodeImage.cshtml" />
-    <None Include="Properties\PublishProfiles\UbgApiv420180609042104 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\UbgApiv420180613021708 - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -323,6 +339,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806091335280_AdjustedAmount.resx">
       <DependentUpon>201806091335280_AdjustedAmount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806130951261_expiryDateAuthTolen.resx">
+      <DependentUpon>201806130951261_expiryDateAuthTolen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806130955189_empty.resx">
+      <DependentUpon>201806130955189_empty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806130957142_New.resx">
+      <DependentUpon>201806130957142_New.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806130958169_SecondTry.resx">
+      <DependentUpon>201806130958169_SecondTry.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

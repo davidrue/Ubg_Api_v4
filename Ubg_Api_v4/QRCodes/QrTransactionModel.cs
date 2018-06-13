@@ -74,6 +74,16 @@ namespace Ubg_Api_v4.QRCodes
 
         }
 
+        public class AnswertAuthTokenModel
+        {
+
+            public string auth_token { get; set; }
+            public DateTime ExpiryDate { get; set; }
+
+        }
+
+
+
         public class GetInformationFromQRCodeModelAnswer
         {
             [Required]
