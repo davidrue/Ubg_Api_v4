@@ -187,6 +187,11 @@
     <Compile Include="Migrations\201806130958169_SecondTry.Designer.cs">
       <DependentUpon>201806130958169_SecondTry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806181312443_Notification.cs" />
+    <Compile Include="Migrations\201806181312443_Notification.Designer.cs">
+      <DependentUpon>201806181312443_Notification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Notification.cs" />
     <Compile Include="QRCodes\QrTransactionModel.cs" />
     <Content Include="App_Code\QRVerToDataSize.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -351,6 +356,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806130958169_SecondTry.resx">
       <DependentUpon>201806130958169_SecondTry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806181312443_Notification.resx">
+      <DependentUpon>201806181312443_Notification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

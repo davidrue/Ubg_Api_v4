@@ -104,6 +104,9 @@ namespace Ubg_Api_v4.QRCodes
             [Required]
             public Boolean adjustible_down { get; set; }
 
+            public string name { get; set; }
+            public string surname { get; set; }
+
         }
 
         public class PaymentHistoryModel

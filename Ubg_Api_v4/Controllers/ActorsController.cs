@@ -386,7 +386,7 @@ namespace Ubg_Api_v4.Controllers
         {
             if (!db.Transactions.Any(u => u.Id == ref_id))
             {
-                return Request.CreateResponse((HttpStatusCode) 465 , ref_id);
+                return Request.CreateResponse((HttpStatusCode) 465 , "Ref_Id is not existent: " + ref_id);
             }
             Transaction transaction = await db.Transactions.FirstOrDefaultAsync(u => u.Id == ref_id);
             if(transaction.AvailableUntil < DateTime.Now)
@@ -401,6 +401,9 @@ namespace Ubg_Api_v4.Controllers
             answer.reference = transaction.Reference;
             answer.adjustible_up = transaction.AdjustibleUp;
             answer.adjustible_down = transaction.AdjustibleDown;
+            answer.name = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).Name;
+            answer.surname = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).SurName;
+
 
             return Request.CreateResponse(HttpStatusCode.OK, answer);
 
@@ -446,6 +449,17 @@ namespace Ubg_Api_v4.Controllers
           
             db.Transactions.FirstOrDefault(u => u.Id == ref_id).Status = "Paid";
 
+            Notification notification = new Notification();
+            notification.amount = transaction.Amount;
+            notification.currency = transaction.Currency;
+            notification.Id = "Notif_" + HelperMethods.GetUniqueKey(10);
+            notification.reference = transaction.Reference;
+            notification.receiverId = transaction.RecipientId;
+            Actor sender = db.Actors.FirstOrDefault(u => u.Id == transaction.SenderId);
+            notification.sender_full_name = sender.SurName + " " + sender.Name;
+
+            db.Notifications.Add(notification);
+
             try
             {
                 await db.SaveChangesAsync();
@@ -458,8 +472,7 @@ namespace Ubg_Api_v4.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, "Successfull Transaction!");
         }
-
-        // GET: client-api/{version}/get-information/{ref_id}
+   
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/{client_id}/paymenthistory")]
         public async Task<HttpResponseMessage> GetPaymentHistory([FromUriAttribute] string client_id)
@@ -516,6 +529,40 @@ namespace Ubg_Api_v4.Controllers
             }
             //return Request.CreateResponse(HttpStatusCode.BadGateway, "Shiiit");
             return Request.CreateResponse(HttpStatusCode.OK, paymentList);
+
+        }
+
+        // GET: client-api/{version}/notifications/{client_id}
+        [Route("client-api/{version}/notifications/{client_id}")]
+        public async Task<HttpResponseMessage> GetNotifications([FromUriAttribute] string client_id)
+        {
+            if (!db.Actors.Any(u => u.Id == client_id))
+            {
+                return Request.CreateResponse((HttpStatusCode)467, "Client is not existent " + client_id);
+            }
+
+            List<Notification> notifications = db.Notifications.Where(u => u.receiverId == client_id).ToList();
+
+            if (notifications.Count == 0)
+            {
+                return Request.CreateResponse((HttpStatusCode)204, "There aren't any open transactions: " + client_id);
+            }
+            foreach (Notification notification in notifications)
+            {
+                db.Notifications.Remove(notification);
+            }
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, notifications);
 
         }
 

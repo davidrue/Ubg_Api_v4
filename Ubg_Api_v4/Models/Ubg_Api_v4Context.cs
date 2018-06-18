@@ -24,5 +24,7 @@ namespace Ubg_Api_v4.Models
         public System.Data.Entity.DbSet<Ubg_Api_v4.Models.BankAccount> BankAccounts { get; set; }
 
         public System.Data.Entity.DbSet<Ubg_Api_v4.Models.Transaction> Transactions { get; set; }
+
+        public System.Data.Entity.DbSet<Ubg_Api_v4.Models.Notification> Notifications { get; set; }
     }
 }
