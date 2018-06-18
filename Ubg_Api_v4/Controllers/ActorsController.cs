@@ -313,17 +313,17 @@ namespace Ubg_Api_v4.Controllers
 
 
         // POST: client-api/{version}/auth       
-        [Route("client-api/{version}/generate", Name = "RequestQrCodeAsClient")]        
-        public async Task<HttpResponseMessage> PostRequestQrCodeAsClient(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel)
+        [Route("client-api/{version}/generate/{client_id}", Name = "RequestQrCodeAsClient")]        
+        public async Task<HttpResponseMessage> PostRequestQrCodeAsClient(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel, [FromUri] string client_id)
         {
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse((HttpStatusCode)422, ModelState);                
             }
 
-            if (!db.Actors.Any(u => u.UserName == requestQrCodeViewModel.user_name))
+            if (!db.Actors.Any(u => u.Id == client_id))
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, requestQrCodeViewModel.user_name);
+                return Request.CreateResponse(HttpStatusCode.NotFound, client_id);
             }           
             if (requestQrCodeViewModel.available_until > 1209600)
             {
@@ -346,7 +346,7 @@ namespace Ubg_Api_v4.Controllers
             transaction.AdjustibleUp = requestQrCodeViewModel.adjustible_up;
             transaction.AdjustibleDown = requestQrCodeViewModel.adjustible_down;
             transaction.Status = "Open";
-            transaction.RecipientId = db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Id;
+            transaction.RecipientId = client_id;
             string transactionId = "Priv_Trans_" + HelperMethods.GetUniqueKey(10);
             transaction.Id = transactionId;
 

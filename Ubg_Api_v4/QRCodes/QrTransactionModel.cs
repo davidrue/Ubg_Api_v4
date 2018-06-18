@@ -41,7 +41,6 @@ namespace Ubg_Api_v4.QRCodes
                
             public string auth_token { get; set; }
 
-            [Required]
             public string user_name { get; set; }
 
         }
