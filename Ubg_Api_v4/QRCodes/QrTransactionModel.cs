@@ -13,7 +13,9 @@ namespace Ubg_Api_v4.QRCodes
         {
             public string link { get; set; }
             public string refId { get; set; }
+            public DateTime available_until { get; set; }
             public string img { get; set; }
+
         }
 
         public class RequestQrCodeViewModel

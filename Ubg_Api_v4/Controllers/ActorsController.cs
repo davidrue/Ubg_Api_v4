@@ -362,7 +362,7 @@ namespace Ubg_Api_v4.Controllers
 
             }
 
-            String transactionUrl = "ubg.transfer/" + transactionId;
+            String transactionUrl = "ubgpay://trans/" + transactionId;
 
             CodeGenerator qrGenerator = new CodeGenerator();
             string img = qrGenerator.RenderQRWithPicture(transactionUrl);
@@ -372,6 +372,7 @@ namespace Ubg_Api_v4.Controllers
             qrLinKRefViewModel.link = transactionUrl;
             qrLinKRefViewModel.img = img;
             qrLinKRefViewModel.refId = transactionId;
+            qrLinKRefViewModel.available_until = transaction.AvailableUntil;
 
             //TODO Test if QR should be included
 
