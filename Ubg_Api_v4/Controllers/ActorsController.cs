@@ -21,11 +21,11 @@ namespace Ubg_Api_v4.Controllers
         private Ubg_Api_v4Context db = new Ubg_Api_v4Context();
 
         
-        [Route("api/{version}/actors")]
-        public IQueryable<Actor> GetActors()
-        {
-            return db.Actors;
-        }
+        //[Route("api/{version}/actors")]
+        //public IQueryable<Actor> GetActors()
+        //{
+        //    return db.Actors;
+        //}
         
         [ResponseType(typeof(Actor))]
         [Route("api/actors/{actorID}/oneActor/{Token}")]
@@ -420,7 +420,7 @@ namespace Ubg_Api_v4.Controllers
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse((HttpStatusCode)422, ModelState);
-               
+                
             }
 
             if (!db.Transactions.Any(u => u.Id == ref_id))
@@ -431,11 +431,15 @@ namespace Ubg_Api_v4.Controllers
             Transaction transaction = new Transaction();
             transaction = db.Transactions.FirstOrDefault(u => u.Id == ref_id);
 
+            if (transaction.Status == "Paid")
+            {
+                return Request.CreateResponse((HttpStatusCode)468, "The Code was already used: " + ref_id);
+            }
+
             if (transaction.AvailableUntil < DateTime.Now)
             {
                 return Request.CreateResponse((HttpStatusCode)466, "The transaction is expired: " + ref_id);
             }
-
             if (!db.Actors.Any(u => u.Id == client_id))
             {
                 return Request.CreateResponse((HttpStatusCode)467, "Unknown Client: " + client_id);

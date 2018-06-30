@@ -17,107 +17,107 @@ namespace Ubg_Api_v4.Controllers
     {
         private Ubg_Api_v4Context db = new Ubg_Api_v4Context();
 
-        // GET: api/BankAccounts
-        public IQueryable<BankAccount> GetBankAccounts()
-        {
-            return db.BankAccounts;
-        }
+        //// GET: api/BankAccounts
+        //public IQueryable<BankAccount> GetBankAccounts()
+        //{
+        //    return db.BankAccounts;
+        //}
 
 
 
-        // GET: api/BankAccounts/5
-        [ResponseType(typeof(BankAccount))]
-        public async Task<IHttpActionResult> GetBankAccount(string id)
-        {
-            BankAccount bankAccount = await db.BankAccounts.FindAsync(id);
-            if (bankAccount == null)
-            {
-                return NotFound();
-            }
+        //// GET: api/BankAccounts/5
+        //[ResponseType(typeof(BankAccount))]
+        //public async Task<IHttpActionResult> GetBankAccount(string id)
+        //{
+        //    BankAccount bankAccount = await db.BankAccounts.FindAsync(id);
+        //    if (bankAccount == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(bankAccount);
-        }
+        //    return Ok(bankAccount);
+        //}
 
-        // PUT: api/BankAccounts/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutBankAccount(string id, BankAccount bankAccount)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// PUT: api/BankAccounts/5
+        //[ResponseType(typeof(void))]
+        //public async Task<IHttpActionResult> PutBankAccount(string id, BankAccount bankAccount)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            if (id != bankAccount.Id)
-            {
-                return BadRequest();
-            }
+        //    if (id != bankAccount.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            db.Entry(bankAccount).State = EntityState.Modified;
+        //    db.Entry(bankAccount).State = EntityState.Modified;
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BankAccountExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!BankAccountExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-        // POST: api/BankAccounts
-        [ResponseType(typeof(BankAccount))]
-        public async Task<IHttpActionResult> PostBankAccount(BankAccount bankAccount)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// POST: api/BankAccounts
+        //[ResponseType(typeof(BankAccount))]
+        //public async Task<IHttpActionResult> PostBankAccount(BankAccount bankAccount)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            db.BankAccounts.Add(bankAccount);
+        //    db.BankAccounts.Add(bankAccount);
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (BankAccountExists(bankAccount.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        if (BankAccountExists(bankAccount.Id))
+        //        {
+        //            return Conflict();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return CreatedAtRoute("DefaultApi", new { id = bankAccount.Id }, bankAccount);
-        }
+        //    return CreatedAtRoute("DefaultApi", new { id = bankAccount.Id }, bankAccount);
+        //}
 
-        // DELETE: api/BankAccounts/5
-        [ResponseType(typeof(BankAccount))]
-        public async Task<IHttpActionResult> DeleteBankAccount(string id)
-        {
-            BankAccount bankAccount = await db.BankAccounts.FindAsync(id);
-            if (bankAccount == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/BankAccounts/5
+        //[ResponseType(typeof(BankAccount))]
+        //public async Task<IHttpActionResult> DeleteBankAccount(string id)
+        //{
+        //    BankAccount bankAccount = await db.BankAccounts.FindAsync(id);
+        //    if (bankAccount == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.BankAccounts.Remove(bankAccount);
-            await db.SaveChangesAsync();
+        //    db.BankAccounts.Remove(bankAccount);
+        //    await db.SaveChangesAsync();
 
-            return Ok(bankAccount);
-        }
+        //    return Ok(bankAccount);
+        //}
 
         protected override void Dispose(bool disposing)
         {

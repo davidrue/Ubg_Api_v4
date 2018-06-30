@@ -11,8 +11,7 @@ namespace Ubg_Api_v4.Models
     {
         [Required]
         public string Id { get; set; }
-
-        [Required]
+                
         public string Name { get; set; }
 
         [Required]

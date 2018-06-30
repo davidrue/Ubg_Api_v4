@@ -70,7 +70,6 @@ namespace Ubg_Api_v4.QRCodes
 
         public class MakePaymentModel
         {
-
             public decimal adjusted_amount { get; set; }           
 
         }

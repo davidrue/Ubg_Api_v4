@@ -30,7 +30,7 @@ namespace Ubg_Api_v4.Models
             [Display(Name = "Your SurName")]
             public string sur_name { get; set; }
 
-            [Required]
+           
             [Display(Name = "Your Name")]
             public string name { get; set; }
 

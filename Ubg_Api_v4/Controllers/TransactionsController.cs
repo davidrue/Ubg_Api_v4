@@ -17,105 +17,105 @@ namespace Ubg_Api_v4.Controllers
     {
         private Ubg_Api_v4Context db = new Ubg_Api_v4Context();
 
-        // GET: api/Transactions
-        public IQueryable<Transaction> GetTransactions()
-        {
-            return db.Transactions;
-        }
+        //// GET: api/Transactions
+        //public IQueryable<Transaction> GetTransactions()
+        //{
+        //    return db.Transactions;
+        //}
 
-        // GET: api/Transactions/5
-        [ResponseType(typeof(Transaction))]
-        public async Task<IHttpActionResult> GetTransaction(string id)
-        {
-            Transaction transaction = await db.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+        //// GET: api/Transactions/5
+        //[ResponseType(typeof(Transaction))]
+        //public async Task<IHttpActionResult> GetTransaction(string id)
+        //{
+        //    Transaction transaction = await db.Transactions.FindAsync(id);
+        //    if (transaction == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(transaction);
-        }
+        //    return Ok(transaction);
+        //}
 
-        // PUT: api/Transactions/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutTransaction(string id, Transaction transaction)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// PUT: api/Transactions/5
+        //[ResponseType(typeof(void))]
+        //public async Task<IHttpActionResult> PutTransaction(string id, Transaction transaction)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            if (id != transaction.Id)
-            {
-                return BadRequest();
-            }
+        //    if (id != transaction.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            db.Entry(transaction).State = EntityState.Modified;
+        //    db.Entry(transaction).State = EntityState.Modified;
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TransactionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TransactionExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-        // POST: api/Transactions
-        [ResponseType(typeof(Transaction))]
-        public async Task<IHttpActionResult> PostTransaction(Transaction transaction)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// POST: api/Transactions
+        //[ResponseType(typeof(Transaction))]
+        //public async Task<IHttpActionResult> PostTransaction(Transaction transaction)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            db.Transactions.Add(transaction);
+        //    db.Transactions.Add(transaction);
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (TransactionExists(transaction.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        if (TransactionExists(transaction.Id))
+        //        {
+        //            return Conflict();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return CreatedAtRoute("DefaultApi", new { id = transaction.Id }, transaction);
-        }
+        //    return CreatedAtRoute("DefaultApi", new { id = transaction.Id }, transaction);
+        //}
 
-        // DELETE: api/Transactions/5
-        [ResponseType(typeof(Transaction))]
-        public async Task<IHttpActionResult> DeleteTransaction(string id)
-        {
-            Transaction transaction = await db.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Transactions/5
+        //[ResponseType(typeof(Transaction))]
+        //public async Task<IHttpActionResult> DeleteTransaction(string id)
+        //{
+        //    Transaction transaction = await db.Transactions.FindAsync(id);
+        //    if (transaction == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.Transactions.Remove(transaction);
-            await db.SaveChangesAsync();
+        //    db.Transactions.Remove(transaction);
+        //    await db.SaveChangesAsync();
 
-            return Ok(transaction);
-        }
+        //    return Ok(transaction);
+        //}
 
         protected override void Dispose(bool disposing)
         {
