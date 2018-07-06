@@ -6,6 +6,7 @@ using System.Web;
 
 namespace Ubg_Api_v4.Models
 {
+    //Code First Model for the Notification
     public class Notification
     {
 
@@ -20,6 +21,8 @@ namespace Ubg_Api_v4.Models
         public string sender_full_name { get; set; }
 
         public string reference { get; set; }
+
+        public string ref_id { get; set; }
 
         [JsonIgnore]
         public string receiverId { get; set; }

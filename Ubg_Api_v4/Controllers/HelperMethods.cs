@@ -9,6 +9,8 @@ namespace Ubg_Api_v4.Controllers
 {
     public static class HelperMethods
     {
+
+        //Method that returns random and unique Keys
         public static string GetUniqueKey(int maxSize)
         {
             char[] chars = new char[62];

@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace Ubg_Api_v4.Models
 {
+    //Code First Model for the BankAccount
     public class BankAccount
     {
 

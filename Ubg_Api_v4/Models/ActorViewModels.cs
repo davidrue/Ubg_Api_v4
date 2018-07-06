@@ -6,6 +6,7 @@ using System.Web;
 
 namespace Ubg_Api_v4.Models
 {
+    //This class contains a set of view models that is used to send information via JSON without sending the whole information that is stored in the database
     public class ActorViewModels
     {
         public class RegisterViewModel

@@ -191,6 +191,18 @@
     <Compile Include="Migrations\201806181312443_Notification.Designer.cs">
       <DependentUpon>201806181312443_Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806302023595_30_06_2018.cs" />
+    <Compile Include="Migrations\201806302023595_30_06_2018.Designer.cs">
+      <DependentUpon>201806302023595_30_06_2018.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807021256143_RefId_in_Notifications.cs" />
+    <Compile Include="Migrations\201807021256143_RefId_in_Notifications.Designer.cs">
+      <DependentUpon>201807021256143_RefId_in_Notifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807041001218_DateInHistory.cs" />
+    <Compile Include="Migrations\201807041001218_DateInHistory.Designer.cs">
+      <DependentUpon>201807041001218_DateInHistory.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Notification.cs" />
     <Compile Include="QRCodes\QrTransactionModel.cs" />
     <Content Include="App_Code\QRVerToDataSize.cs" />
@@ -263,7 +275,9 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="QRCodes\blue.jpg" />
     <Content Include="QRCodes\ubgLogo.jpg" />
+    <Content Include="QRCodes\white.jpg" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -359,6 +373,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806181312443_Notification.resx">
       <DependentUpon>201806181312443_Notification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806302023595_30_06_2018.resx">
+      <DependentUpon>201806302023595_30_06_2018.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807021256143_RefId_in_Notifications.resx">
+      <DependentUpon>201807021256143_RefId_in_Notifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807041001218_DateInHistory.resx">
+      <DependentUpon>201807041001218_DateInHistory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

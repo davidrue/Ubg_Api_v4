@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace Ubg_Api_v4.Models
 {
+    //Code First Model for the Transaction
     public class Transaction
     {
         [Required]
@@ -50,6 +51,7 @@ namespace Ubg_Api_v4.Models
         [Required]
         public string Status { get; set; }
 
+        public DateTime DateOfPayment { get; set; }
 
     }
 }

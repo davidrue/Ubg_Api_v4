@@ -16,17 +16,14 @@ using Ubg_Api_v4.QRCodes;
 
 namespace Ubg_Api_v4.Controllers
 {
+    //Controller that contains the methods for all possible API requests for our prototype
     public class ActorsController : ApiController
     {
         private Ubg_Api_v4Context db = new Ubg_Api_v4Context();
 
         
-        //[Route("api/{version}/actors")]
-        //public IQueryable<Actor> GetActors()
-        //{
-        //    return db.Actors;
-        //}
-        
+       
+        //Returns a specific Actors
         [ResponseType(typeof(Actor))]
         [Route("api/actors/{actorID}/oneActor/{Token}")]
         public async Task<IHttpActionResult> GetActor(string actorId, string Token)
@@ -40,41 +37,9 @@ namespace Ubg_Api_v4.Controllers
             return Ok(actor);
         }
 
-        // GET: vendor-api/v1.0/confirm       
-        [Route("vendor-api/{version}/{ref_id}/{auth_token}/confirm", Name = "ConfirmPaymentVendor")]
-        public async Task<HttpResponseMessage> GetConfirmPayment([FromUriAttribute] string ref_id, [FromUriAttribute] string auth_token)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse((HttpStatusCode)422, ModelState);
-            }
-            if(!db.Transactions.Any(u => u.Id == ref_id))
-            {
-                return Request.CreateResponse((HttpStatusCode) 465, ref_id);
-            }
-            Transaction transaction = db.Transactions.FirstOrDefault(u => u.Id == ref_id);
-            if (auth_token != db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).AuthToken)
-            {
-                return Request.CreateResponse((HttpStatusCode)401, auth_token);
-            }
+    
 
-            QrTransactionModel.PaymentConfirmationAnswerModel answer = new QrTransactionModel.PaymentConfirmationAnswerModel();
-            if (transaction.Status == "Paid")
-            {
-                answer.transfer_commissioned = true;
-                answer.amount = transaction.Amount;
-                answer.adjusted_amount = transaction.Adjusted;
-            } else
-            {
-                answer.transfer_commissioned = false;
-                answer.amount = transaction.Amount;
-                answer.adjusted_amount = transaction.Adjusted;
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK, answer);
-        }
-
-        // POST: vendor-api/{version}/register
+        //#1 With this API request, any vendor is able to register his shop to enable the UBG Pay solution
         [ResponseType(typeof(Actor))]
         [Route("vendor-api/{version}/register", Name = "RegisterNewVendor")]
         public async Task<HttpResponseMessage> PostVendor(ActorViewModels.RegisterViewModel actorModel)
@@ -133,7 +98,7 @@ namespace Ubg_Api_v4.Controllers
             return response;
         }
 
-        // POST: client-api/{version}/register
+        //This method is called from the UBG Pay App to automatically register a new client
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/register", Name = "RegisterNewClient")]
         public async Task<HttpResponseMessage> PostClient(ActorViewModels.RegisterViewModel actorModel)
@@ -192,7 +157,7 @@ namespace Ubg_Api_v4.Controllers
             return response;
         }
 
-        // POST: vendor-api/{version}/auth       
+        //#2: This Method is called by a Vendor to request a new Authentification token that he can use for 24 hours    
         [Route("vendor-api/{version}/auth", Name = "RequestToken")]
         public async Task<HttpResponseMessage> PostTokenRequest(ActorViewModels.RequestTokenViewModel requestTokenViewModel)
         {
@@ -235,8 +200,44 @@ namespace Ubg_Api_v4.Controllers
             return Request.CreateResponse((HttpStatusCode)200, answer);
             
         }
-    
-        // POST: vendor-api/{version}/auth       
+
+
+        //#4: Within this request, a vendor is able to check wether a payment was successfully authorized       
+        [Route("vendor-api/{version}/{ref_id}/{auth_token}/confirm", Name = "ConfirmPaymentVendor")]
+        public async Task<HttpResponseMessage> GetConfirmPayment([FromUriAttribute] string ref_id, [FromUriAttribute] string auth_token)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse((HttpStatusCode)422, ModelState);
+            }
+            if (!db.Transactions.Any(u => u.Id == ref_id))
+            {
+                return Request.CreateResponse((HttpStatusCode)465, ref_id);
+            }
+            Transaction transaction = db.Transactions.FirstOrDefault(u => u.Id == ref_id);
+            if (auth_token != db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).AuthToken)
+            {
+                return Request.CreateResponse((HttpStatusCode)401, auth_token);
+            }
+
+            QrTransactionModel.PaymentConfirmationAnswerModel answer = new QrTransactionModel.PaymentConfirmationAnswerModel();
+            if (transaction.Status == "Paid")
+            {
+                answer.transfer_commissioned = true;
+                answer.amount = transaction.Amount;
+                answer.adjusted_amount = transaction.Adjusted;
+            }
+            else
+            {
+                answer.transfer_commissioned = false;
+                answer.amount = transaction.Amount;
+                answer.adjusted_amount = transaction.Adjusted;
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, answer);
+        }
+
+        // #3: Method that generates a QR Code which includes the link that redirects the client into his app
         [Route("vendor-api/{version}/generate", Name = "RequestQrCodeAsVendor")]
         public async Task<HttpResponseMessage> PostRequestQrCodeAsVendor(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel)
         {
@@ -282,6 +283,7 @@ namespace Ubg_Api_v4.Controllers
             transaction.RecipientId = db.Actors.FirstOrDefault(u => u.UserName == requestQrCodeViewModel.user_name).Id;
             string transactionId = "Ref_" + HelperMethods.GetUniqueKey(10);
             transaction.Id = transactionId;
+            transaction.DateOfPayment = DateTime.Now;
 
             db.Transactions.Add(transaction);
 
@@ -306,13 +308,11 @@ namespace Ubg_Api_v4.Controllers
             qrLinKRefViewModel.img = img;
             qrLinKRefViewModel.refId = transactionId;
 
-            //TODO Test if QR should be included
-
             return Request.CreateResponse(HttpStatusCode.Created, qrLinKRefViewModel);          
         }
 
 
-        // POST: client-api/{version}/auth       
+        //#8: The App calls this request when a client wants to generate a QR Code to share with his friends    
         [Route("client-api/{version}/generate/{client_id}", Name = "RequestQrCodeAsClient")]        
         public async Task<HttpResponseMessage> PostRequestQrCodeAsClient(QrTransactionModel.RequestQrCodeViewModel requestQrCodeViewModel, [FromUri] string client_id)
         {
@@ -349,6 +349,7 @@ namespace Ubg_Api_v4.Controllers
             transaction.RecipientId = client_id;
             string transactionId = "Priv_Trans_" + HelperMethods.GetUniqueKey(10);
             transaction.Id = transactionId;
+            transaction.DateOfPayment = DateTime.Now;
 
             db.Transactions.Add(transaction);
 
@@ -380,7 +381,8 @@ namespace Ubg_Api_v4.Controllers
         }
 
 
-        // GET: client-api/{version}/get-information
+        //#5 The App automatically callls this method when a QR Code from UBG is being clicked and the user is redirected into his app
+        //It returns all revelant information about the transaction
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/get-information/{ref_id}")]
         public async Task<HttpResponseMessage> GetInformation([FromUriAttribute] string ref_id)
@@ -393,6 +395,10 @@ namespace Ubg_Api_v4.Controllers
             if(transaction.AvailableUntil < DateTime.Now)
             {
                 return Request.CreateResponse((HttpStatusCode) 466, "The transaction is expired: " + ref_id);
+            }
+            if (transaction.Status == "Paid")
+            {
+                return Request.CreateResponse((HttpStatusCode)468, "The Code was already used: " + ref_id);
             }
 
             QrTransactionModel.GetInformationFromQRCodeModelAnswer answer = new QrTransactionModel.GetInformationFromQRCodeModelAnswer();
@@ -412,7 +418,7 @@ namespace Ubg_Api_v4.Controllers
 
 
 
-        // POST: client-api/{version}/make-payment
+        //#6 This Method is called from the App when a user confirmed and authorized a transaction in his app
         [HttpPost]
         [Route("client-api/{version}/make-payment/{ref_id}/{client_id}")]
         public async Task<HttpResponseMessage> PostMakePayment([FromUriAttribute] string ref_id, [FromUriAttribute] string client_id, QrTransactionModel.MakePaymentModel adjusted_amountModel)
@@ -435,7 +441,10 @@ namespace Ubg_Api_v4.Controllers
             {
                 return Request.CreateResponse((HttpStatusCode)468, "The Code was already used: " + ref_id);
             }
-
+            if(transaction.RecipientId == client_id)
+            {
+                return Request.CreateResponse((HttpStatusCode)471, "Cant be Sender and Receiver: " + ref_id);
+            }
             if (transaction.AvailableUntil < DateTime.Now)
             {
                 return Request.CreateResponse((HttpStatusCode)466, "The transaction is expired: " + ref_id);
@@ -446,22 +455,23 @@ namespace Ubg_Api_v4.Controllers
             }
 
             db.Transactions.FirstOrDefault(u => u.Id == ref_id).SenderId = client_id;
-            if(db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount != adjusted_amountModel.adjusted_amount)
+            db.Transactions.FirstOrDefault(u => u.Id == ref_id).DateOfPayment = DateTime.Now;
+            if (db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount != adjusted_amountModel.adjusted_amount)
             {
                 transaction.Adjusted = true;
                 db.Transactions.FirstOrDefault(u => u.Id == ref_id).Amount = adjusted_amountModel.adjusted_amount;
             }
           
             db.Transactions.FirstOrDefault(u => u.Id == ref_id).Status = "Paid";
-
             Notification notification = new Notification();
             notification.amount = transaction.Amount;
             notification.currency = transaction.Currency;
             notification.Id = "Notif_" + HelperMethods.GetUniqueKey(10);
             notification.reference = transaction.Reference;
             notification.receiverId = transaction.RecipientId;
+            notification.ref_id = transaction.Id;
             Actor sender = db.Actors.FirstOrDefault(u => u.Id == transaction.SenderId);
-            notification.sender_full_name = sender.SurName + " " + sender.Name;
+            notification.sender_full_name = sender.Name + " " + sender.SurName;
 
             db.Notifications.Add(notification);
 
@@ -477,7 +487,8 @@ namespace Ubg_Api_v4.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, "Successfull Transaction!");
         }
-   
+
+        //#7 This method returns all successfull transactions that are associated with a certain client
         [ResponseType(typeof(Actor))]
         [Route("client-api/{version}/{client_id}/paymenthistory")]
         public async Task<HttpResponseMessage> GetPaymentHistory([FromUriAttribute] string client_id)
@@ -501,20 +512,30 @@ namespace Ubg_Api_v4.Controllers
 
             List<Transaction> senderTransactions = db.Transactions.Where(u => u.SenderId == client_id).ToList();            
             List<Transaction> receiverTransactions = db.Transactions.Where(u => u.RecipientId == client_id).ToList();
-            
 
-             foreach (Transaction transaction in senderTransactions){
+
+            foreach (Transaction transaction in senderTransactions){
                 var payment = new QrTransactionModel.PaymentHistoryModel();
                 payment.ref_id = transaction.Id;
                 payment.amount = transaction.Amount;
                 payment.currency = transaction.Currency;
                 payment.reference = transaction.Reference;
                 payment.receiver = false;
-                payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.RecipientId).UserName;                                
-                paymentList.Add(payment);
-            }
-            //Hier endet der Fehler
+                payment.payment_time = transaction.DateOfPayment;
 
+                string otherId = transaction.RecipientId;
+                if(otherId != null)
+                {
+                    payment.other_name = db.Actors.FirstOrDefault(u => u.Id == otherId).Name + " " + db.Actors.FirstOrDefault(u => u.Id == otherId).SurName;
+                    paymentList.Add(payment);
+                }
+                //else
+                //{
+                //    payment.other_name = "No Sender yet!";
+                //}
+             
+            }
+           
             foreach (Transaction transaction in receiverTransactions)
             {
                 var payment = new QrTransactionModel.PaymentHistoryModel();
@@ -523,21 +544,35 @@ namespace Ubg_Api_v4.Controllers
                 payment.currency = transaction.Currency;
                 payment.reference = transaction.Reference;
                 payment.receiver = true;
-                payment.other_name = db.Actors.FirstOrDefault(u => u.Id == transaction.SenderId).UserName;
-                paymentList.Add(payment);
+                payment.payment_time = transaction.DateOfPayment;
+
+                string otherId = transaction.SenderId;
+                if (otherId != null)
+                {
+                    payment.other_name = db.Actors.FirstOrDefault(u => u.Id == otherId).Name + " " + db.Actors.FirstOrDefault(u => u.Id == otherId).SurName;
+                    paymentList.Add(payment);
+                }
+                //else
+                //{
+                //    payment.other_name = "No Sender yet!";
+                //}
+                //paymentList.Add(payment);
             }
-           
+
 
             if (paymentList.Count == 0)
             {
-                return Request.CreateResponse((HttpStatusCode) 470, "No history");
+                return Request.CreateResponse((HttpStatusCode) 204, "No history");
             }
+
+            List<QrTransactionModel.PaymentHistoryModel> SortedList = paymentList.OrderByDescending(o => o.payment_time).ToList();
+
             //return Request.CreateResponse(HttpStatusCode.BadGateway, "Shiiit");
-            return Request.CreateResponse(HttpStatusCode.OK, paymentList);
+            return Request.CreateResponse(HttpStatusCode.OK, SortedList);
 
         }
 
-        // GET: client-api/{version}/notifications/{client_id}
+        //#9 After a client received money from someone else, a notification is generated and send to the client him to inform him
         [Route("client-api/{version}/notifications/{client_id}")]
         public async Task<HttpResponseMessage> GetNotifications([FromUriAttribute] string client_id)
         {
@@ -571,7 +606,7 @@ namespace Ubg_Api_v4.Controllers
 
         }
 
-        // DELETE: api/Actors/5
+        // Method to delete a certain actor
         [ResponseType(typeof(Actor))]
         public async Task<IHttpActionResult> DeleteActor(string id)
         {

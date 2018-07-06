@@ -7,6 +7,7 @@ using System.Web.Http;
 
 namespace Ubg_Api_v4.Controllers
 {
+    //Not relevant for this Prototype. All relevant API Actions are in the "ActorsController
     public class ValuesController : ApiController
     {
         // GET api/values

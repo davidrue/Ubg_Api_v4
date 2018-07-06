@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace Ubg_Api_v4.Models
 {
+    //Code First Model for the Actor (Client and Vendor)
     public class Actor
     {
         [Required]

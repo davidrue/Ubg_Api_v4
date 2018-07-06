@@ -7,6 +7,7 @@ using System.Web;
 
 namespace Ubg_Api_v4.QRCodes
 {
+    //This class contains a set of view models that is used to send information via JSON without sending the whole information that is stored in the database
     public class QrTransactionModel
     {
         public class QrLinKRefViewModel
@@ -128,6 +129,8 @@ namespace Ubg_Api_v4.QRCodes
 
             [Required]
             public string other_name { get; set; }
+
+            public DateTime payment_time { get; set; }
 
         }
     }

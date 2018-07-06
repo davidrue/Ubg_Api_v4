@@ -13,6 +13,7 @@ using Ubg_Api_v4.Models;
 
 namespace Ubg_Api_v4.Controllers
 {
+    //Not relevant for this Prototype. All relevant API Actions are in the "ActorsController
     public class TransactionsController : ApiController
     {
         private Ubg_Api_v4Context db = new Ubg_Api_v4Context();

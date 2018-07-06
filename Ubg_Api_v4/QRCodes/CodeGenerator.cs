@@ -36,6 +36,9 @@ namespace Ubg_Api_v4.QRCodes
 //atm.Name = "Option (" + counter + ").ics";
 //                            counter++;
 //                            _messageService._msg.Attachments.Add(atm);
+
+        //This class contains the methd where the QR Codes are being generated
+
     public class CodeGenerator
     {
         QRCodeEncoder qrEncoder;
@@ -46,7 +49,7 @@ namespace Ubg_Api_v4.QRCodes
             this.qrEncoder = new QRCodeEncoder();
         }
 
-
+        //A Method for testing
         public void RenderQrCode()
         {
             String saveIn = pathNotebook + "Code1.jpg";
@@ -57,6 +60,7 @@ namespace Ubg_Api_v4.QRCodes
 
         }
  
+        //Method that receives an URL and then converts it into the QR Code with the UBG Logo
         public string RenderQRWithPicture(String url)
         {
             String saveIn = pathPC + "Code1.jpg";
@@ -85,6 +89,7 @@ namespace Ubg_Api_v4.QRCodes
 
         }
 
+        //Method that encodes an image into a Base64 string to pass it later via JSON
         public string ImageToBase64(String path )
         {
             string base64String = null;            
